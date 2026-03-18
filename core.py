@@ -1,4 +1,19 @@
-inventory = []
+import json
+import os
+
+ARQUIVO_JSON = "arquivo.json"
+
+def load_data():
+    if not os.path.exists(ARQUIVO_JSON):
+        return []
+    with open(ARQUIVO_JSON, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def save_data(): 
+    with open (ARQUIVO_JSON, "w", encoding="utf-8") as f:
+        json.dump(inventory, f, indent=4, ensure_ascii=False)
+
+inventory = load_data()
 
 def register_item():
     print("\n--- Item Registration ---")
@@ -26,6 +41,7 @@ def register_item():
             'notes': notes,
         }
         inventory.append(item)
+        save_data()
         print(f"✅ Item '{name}' successfully registered with ID {item_id}!")
 
     except ValueError:
@@ -64,10 +80,12 @@ def add_or_remove():
             if item["id"] == item_id:
                 if operation == "add":
                     item["quantity"] += amount_to_change
+                    save_data()
                     print(f"New total for {item['name']}: {item['quantity']}")
                 elif operation == "rem":
                     if item["quantity"] >= amount_to_change:
                         item["quantity"] -= amount_to_change
+                        save_data()
                         print(f"New total for {item['name']}: {item['quantity']}")
                     else:
                         print("Error: Insufficient stock.")
@@ -85,6 +103,7 @@ def loan_registration():
             if item["id"] == item_id: 
                 if quantity > 0 and item["quantity"] >= quantity:
                     item["quantity"] -= quantity
+                    save_data()
                     print(f"Loan of {quantity}x {item['name']} completed!")
                     return
                 else:
